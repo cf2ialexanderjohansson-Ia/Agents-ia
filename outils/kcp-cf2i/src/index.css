@@ -1,0 +1,11 @@
+@import "tailwindcss";
+:root { --navy:#16284E; --orange:#EC7A2D; }
+body { margin:0; font-family: ui-sans-serif, system-ui, Arial, sans-serif; background:#F2F5FA; }
+@media print {
+  body * { visibility:hidden; }
+  .print-area, .print-area * { visibility:visible; }
+  .print-area { position:absolute; left:0; top:0; width:210mm; }
+  .fd-page { page-break-after:always; box-shadow:none !important; border:none !important; }
+  .no-print { display:none !important; }
+}
+textarea:focus, input:focus, select:focus { outline:none; border-color:#EC7A2D; box-shadow:0 0 0 3px #EC7A2D22; }
