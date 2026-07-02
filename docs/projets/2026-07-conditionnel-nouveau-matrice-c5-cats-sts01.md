@@ -57,3 +57,34 @@ L'élément déclencheur est une **impression du fondateur de CF2I** ("pourrait 
 ## 7. Rappel de gouvernance
 
 Ce cadrage ne constitue pas une autorisation d'engager des ressources pédagogiques ou commerciales. Il s'agit d'un document de préparation destiné à garantir qu'une vérification factuelle soit faite rapidement après le 8 juillet 2026, sans que le sujet ne soit ni oublié, ni engagé sur la seule base d'une impression non confirmée.
+
+---
+
+## 8. Piste parallèle — DJI Matrice 400 + kit C5 tiers (Kronos M400)
+
+**Statut : élément factuel confirmé, distinct du teaser du 8 juillet — à traiter séparément et plus vite.**
+
+En creusant l'hypothèse C5 du fondateur, la veille a identifié un produit **déjà existant et disponible en France**, sans lien avec le teaser du 8 juillet :
+
+| Élément | Statut |
+|---|---|
+| Le DJI Matrice 400 (M400) existe et est commercialisé en France depuis juin 2025 | Confirmé |
+| Le M400 est certifié **classe C3** en sortie d'usine chez DJI | Confirmé |
+| Un **kit de conversion C5 tiers existe : "Kronos M400" (Dronavia)**, ajoutant parachute (PRS) + Flight Termination System (FTS), conforme EASA MOC M2/MOC 2511 | Confirmé |
+| Avec ce kit, le M400 devient éligible **classe C5 → scénario STS-01** | Confirmé (mais porté par le kit, pas par DJI) |
+| Disponibilité via les partenaires CF2I | Le M400 est distribué par **Flying Eye** et **Innov8** ; le kit Kronos C5 est un produit **Dronavia**, tiers non lié aux deux partenaires actuels — à vérifier s'ils le distribuent aussi ou s'il faut un 3e fournisseur |
+| Prix indicatif M400 seul (non officiel, à confirmer par devis) | ~10 800 – 11 300 € HT, hors kit C5 |
+
+**Point de vigilance réglementaire important** : avec le kit Kronos, c'est **Dronavia (l'intégrateur), pas DJI**, qui devient "fabricant" au sens du règlement UE 2019/945 pour l'ensemble modifié, et qui doit fournir la déclaration UE de conformité correspondante. Avant toute promesse commerciale à un client sur une éligibilité STS-01, il faut faire vérifier cette documentation par un expert réglementaire — ce n'est pas un marquage DJI natif.
+
+**Différence avec la section 1-7 de cette fiche** : cette piste M400 + Kronos ne dépend pas de la révélation DJI du 8 juillet et peut être instruite dès maintenant, en parallèle du jalon J2. Elle est cependant moins "clé en main" qu'un drone nativement C5, car elle ajoute un fournisseur et une chaîne de conformité tierce.
+
+**Jalon proposé (indépendant de J1/J2)** :
+
+| Jalon | Contenu | Condition |
+|---|---|---|
+| Ja — Vérification fournisseur | Contacter Flying Eye et Innov8 pour savoir s'ils distribuent le M400 en configuration C3 uniquement ou peuvent fournir/orienter vers le kit Kronos C5 ; demander un devis M400 + kit | À lancer dès maintenant, sans attendre le 8 juillet |
+| Jb — Vérification conformité | Faire confirmer par un expert réglementaire la validité de la déclaration UE de conformité Dronavia pour l'ensemble M400 + Kronos avant toute offre packagée | Après Ja |
+| Jc — Si Ja/Jb positifs | Brief vers `cf2i-production` pour évaluer l'intégration au pack "Prêt à voler STS-01" ; brief vers `cf2i-pedago` pour le contenu matériel du module CATS/STS-01 | Après Jb |
+
+Cette piste ne remplace pas la vérification J2 sur le nouveau drone teasé (section 4) : les deux pistes sont suivies en parallèle, indépendamment l'une de l'autre.
