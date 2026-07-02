@@ -17,11 +17,11 @@ Ne pas introduire d'autres couleurs dominantes (pas de bleu profond/cyan différ
 
 ## Typographie
 
-Aucune police custom : l'outil CF2i utilise la pile système standard.
-- Texte courant : `ui-sans-serif, system-ui, Arial, sans-serif`
-- Code / données tabulaires : `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`
+Décision explicite (2026-07-02) : **Arial** pour tous les titres et le texte courant, sur l'ensemble des documents CF2I.
+- Titres et texte courant : `Arial, Helvetica, sans-serif`
+- Code / données tabulaires (références réglementaires, chiffres alignés) : `ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`
 
-→ Ne pas embarquer de police tierce (Google Fonts, etc.) dans les prochains documents : rester sur cette pile système, plus simple à maintenir et cohérente avec l'outil existant.
+→ Ne pas embarquer de police tierce (Google Fonts, etc.) : Arial est une police système disponible partout, aucun `@font-face` n'est nécessaire.
 
 ## Structure standard d'une fiche programme
 
