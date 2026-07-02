@@ -30,6 +30,7 @@ L'élément déclencheur est une **impression du fondateur de CF2I** ("pourrait 
 | Ce drone sera certifié classe C5 | **Non confirmé — simple hypothèse/impression du fondateur** |
 | Ce drone serait éligible au scénario STS-01 | **Conséquence hypothétique de l'hypothèse précédente, donc également non confirmée** |
 | Lien avec le module CATS/STS-01 déjà cadré | Pertinent **uniquement si** la certification C5 est confirmée |
+| Signal marketing faible : le slogan teaser "For the Priceless Below" évoque la protection des tiers au sol, thème central de la mitigation de risque exigée en classe C5 (ex. parachute/impact-limiting) | **Signal faible, non technique** — cohérent avec l'hypothèse C5 mais aussi compatible avec d'autres arguments sécurité (anticollision, detect-and-avoid...). Ne change pas le statut "non confirmé" ; à mentionner à titre indicatif seulement lors du jalon J2 |
 
 ## 4. Rétroplanning à jalons — avec jalon de vérification obligatoire
 
