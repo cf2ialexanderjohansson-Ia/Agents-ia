@@ -1,4 +1,5 @@
 import pptxgen from "pptxgenjs";
+import { triggerDownload } from "./download.js";
 
 const NAVY = "15293F";
 const ORANGE = "ED6F08";
@@ -62,5 +63,7 @@ export async function exportSupportPptx(fd, constants, filename) {
     }
   });
 
-  await pptx.writeFile({ fileName: filename });
+  const blob = await pptx.write({ outputType: "blob" });
+  triggerDownload(blob, filename);
+  return blob;
 }

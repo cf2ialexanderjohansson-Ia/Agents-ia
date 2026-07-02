@@ -3,6 +3,7 @@ import {
   WidthType, BorderStyle, AlignmentType, ShadingType, ImageRun, PageBreak,
 } from "docx";
 import { lines, parseProgramme } from "./store.js";
+import { triggerDownload } from "./download.js";
 
 const NAVY = "15293F";
 const ORANGE = "ED6F08";
@@ -171,12 +172,5 @@ export async function exportFicheDescriptiveWord(fd, constants, filename) {
 
   const blob = await Packer.toBlob(doc);
   triggerDownload(blob, filename);
-}
-
-function triggerDownload(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  return blob;
 }

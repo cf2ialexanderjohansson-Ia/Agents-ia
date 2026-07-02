@@ -50,6 +50,23 @@ Fichiers clés :
 - `src/exportWord.js` — export Word (.docx) de la fiche descriptive
 - `src/exportExcel.js` — export Excel (.xlsx) du déroulé pédagogique
 - `src/exportPpt.js` — export PowerPoint (.pptx) du support de formation
+- `src/download.js` — déclenchement du téléchargement navigateur d'un Blob
+- `src/localFolder.js` — archivage automatique dans un dossier local/NAS (File System Access API)
+
+## Archivage automatique sur un dossier NAS
+
+En plus du téléchargement classique, chaque export (PDF, Word, Excel, PowerPoint) peut être **automatiquement enregistré dans un dossier de votre choix** — typiquement un lecteur réseau NAS monté sur votre poste (ex. `\\NAS\formations` ou un lecteur `Z:\`).
+
+Configuration (dans **Réglages**, icône engrenage) :
+1. Cliquez sur **« Choisir un dossier… »** et sélectionnez le dossier NAS monté (une seule fois).
+2. Cochez **« Archiver automatiquement mes exports dans ce dossier »**.
+3. À chaque « Télécharger PDF » ou export bureautique, le fichier est aussi écrit directement dans ce dossier.
+
+Points importants :
+- Fonctionne uniquement sur **Chrome ou Edge (ordinateur)** : ce sont les seuls navigateurs à implémenter la *File System Access API* utilisée pour écrire dans un dossier sans passer par le téléchargement.
+- Le dossier doit être **accessible comme un dossier local** (lecteur réseau monté/mappé) — le navigateur ne sait pas parler SMB/FTP directement.
+- Par sécurité, les navigateurs redemandent parfois de **réactiver l'accès** au dossier après un redémarrage (bouton « Réactiver l'accès » qui apparaît automatiquement dans Réglages) ; c'est une confirmation en un clic, pas besoin de resélectionner le dossier.
+- Si l'écriture échoue (dossier déconnecté, permission refusée…), le téléchargement classique a quand même lieu : l'archivage NAS est un plus, jamais bloquant.
 
 ## Rédaction assistée (optionnelle)
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   FileText, CalendarClock, BookOpen, Library, Settings, Save, Plus, Printer,
-  Download, Check, Trash2, X, Loader2, FileType2,
+  Download, Check, Trash2, X, Loader2, FileType2, FolderOpen, HardDrive,
 } from "lucide-react";
 import {
   NAVY, ORANGE, LIGHT, GREY, LINE, EXAMPLE, blankFD, store,
@@ -11,6 +11,7 @@ import { downloadPDF } from "./pdf.js";
 import { exportFicheDescriptiveWord } from "./exportWord.js";
 import { exportDerouleExcel } from "./exportExcel.js";
 import { exportSupportPptx } from "./exportPpt.js";
+import * as localFolder from "./localFolder.js";
 import { Action } from "./ui.jsx";
 import FicheDescriptive from "./components/FicheDescriptive.jsx";
 import Deroule from "./components/Deroule.jsx";
@@ -32,9 +33,49 @@ export default function App() {
   const [apiKey, setKey] = useState(() => getApiKey());
   const [pdfBusy, setPdfBusy] = useState(false);
   const [officeBusy, setOfficeBusy] = useState(false);
+  const [archiveConfig, setArchiveConfig] = useState(() => store.getArchiveConfig());
+  const [folderHandle, setFolderHandle] = useState(null);
+  const [folderPerm, setFolderPerm] = useState("unavailable"); // granted | prompt | denied | unavailable
+  const [archiveMsg, setArchiveMsg] = useState("");
 
   useEffect(() => { store.setCurrent(fd); }, [fd]);
   useEffect(() => { store.setConstants(constants); }, [constants]);
+  useEffect(() => { store.setArchiveConfig(archiveConfig); }, [archiveConfig]);
+
+  useEffect(() => {
+    (async () => {
+      const handle = await localFolder.getSavedHandle();
+      if (!handle) return;
+      setFolderHandle(handle);
+      setFolderPerm(await localFolder.checkPermission(handle));
+    })();
+  }, []);
+
+  async function chooseArchiveFolder() {
+    try {
+      const handle = await localFolder.pickFolder();
+      setFolderHandle(handle);
+      setFolderPerm("granted");
+      setArchiveConfig((c) => ({ ...c, folderName: handle.name }));
+    } catch (e) { if (e.name !== "AbortError") alert("Impossible d'ouvrir le sélecteur de dossier : " + e.message); }
+  }
+  async function reauthorizeFolder() {
+    const perm = await localFolder.requestPermission(folderHandle);
+    setFolderPerm(perm);
+  }
+  async function forgetArchiveFolder() {
+    await localFolder.forgetFolder();
+    setFolderHandle(null);
+    setFolderPerm("unavailable");
+    setArchiveConfig((c) => ({ ...c, folderName: "", autoSave: false }));
+  }
+  async function archiveIfNeeded(blob, filename) {
+    if (!archiveConfig.autoSave || !blob) return;
+    if (!folderHandle) { setArchiveMsg("Aucun dossier NAS configuré (Réglages)."); return; }
+    if (folderPerm !== "granted") { setArchiveMsg("Accès au dossier NAS à réactiver (Réglages)."); return; }
+    try { await localFolder.saveFile(folderHandle, blob, filename); setArchiveMsg(`Archivé sur le NAS : ${filename}`); }
+    catch (e) { setArchiveMsg(""); alert("Archivage NAS impossible : " + e.message); }
+  }
 
   function doSave() {
     try { const rec = store.save(fd); setFd(rec); setLib(store.list()); setSaved(true); setTimeout(() => setSaved(false), 1600); }
@@ -48,22 +89,23 @@ export default function App() {
     const el = document.querySelector(".print-area");
     if (!el) { alert("Ouvrez un document (Fiche, Déroulé ou Support) avant de télécharger."); return; }
     const labels = { fd: "fiche-descriptive", deroule: "deroule", support: "support" };
+    const filename = `${(fd.code || "formation")}_${labels[tab] || tab}.pdf`;
     setPdfBusy(true);
-    try { await downloadPDF(el, `${(fd.code || "formation")}_${labels[tab] || tab}.pdf`); }
+    try { const blob = await downloadPDF(el, filename); await archiveIfNeeded(blob, filename); }
     catch (e) { alert("Échec de génération du PDF : " + e.message); }
     finally { setPdfBusy(false); }
   }
 
   const OFFICE_EXPORT = {
-    fd: { label: "Export Word", run: () => exportFicheDescriptiveWord(fd, constants, `${fd.code || "formation"}_fiche-descriptive.docx`) },
-    deroule: { label: "Export Excel", run: () => exportDerouleExcel(fd, `${fd.code || "formation"}_deroule.xlsx`) },
-    support: { label: "Export PowerPoint", run: () => exportSupportPptx(fd, constants, `${fd.code || "formation"}_support.pptx`) },
+    fd: { label: "Export Word", filename: `${fd.code || "formation"}_fiche-descriptive.docx`, run: (fn) => exportFicheDescriptiveWord(fd, constants, fn) },
+    deroule: { label: "Export Excel", filename: `${fd.code || "formation"}_deroule.xlsx`, run: (fn) => exportDerouleExcel(fd, fn) },
+    support: { label: "Export PowerPoint", filename: `${fd.code || "formation"}_support.pptx`, run: (fn) => exportSupportPptx(fd, constants, fn) },
   }[tab];
 
   async function doOfficeExport() {
     if (!OFFICE_EXPORT) return;
     setOfficeBusy(true);
-    try { await OFFICE_EXPORT.run(); }
+    try { const blob = await OFFICE_EXPORT.run(OFFICE_EXPORT.filename); await archiveIfNeeded(blob, OFFICE_EXPORT.filename); }
     catch (e) { alert("Échec de l'export : " + e.message); }
     finally { setOfficeBusy(false); }
   }
@@ -120,6 +162,39 @@ export default function App() {
             <p className="text-xs mb-2" style={{ color: GREY }}>Clé API Anthropic pour la rédaction assistée. Stockée uniquement dans ce navigateur. Pour un usage partagé, passez plutôt par un backend proxy.</p>
             <input value={apiKey} onChange={(e) => setKey(e.target.value)} type="password" placeholder="sk-ant-..." className="w-full text-sm rounded-md border px-2.5 py-2 mb-3" style={{ borderColor: LINE }} />
             <button onClick={saveKey} className="w-full text-sm font-semibold text-white py-2 rounded-md" style={{ background: NAVY }}>Enregistrer la clé</button>
+
+            <div className="mt-5 pt-4" style={{ borderTop: `1px solid ${LINE}` }}>
+              <div className="flex items-center gap-1.5 font-bold mb-2" style={{ color: NAVY }}><HardDrive size={15} /> Archivage automatique (dossier NAS)</div>
+              {!localFolder.isSupported() ? (
+                <p className="text-xs" style={{ color: GREY }}>Fonctionnalité disponible sur Chrome ou Edge (ordinateur) uniquement.</p>
+              ) : (
+                <>
+                  <p className="text-xs mb-2" style={{ color: GREY }}>Choisissez un dossier (ex. votre lecteur réseau NAS monté) : chaque export PDF/Word/Excel/PowerPoint y sera aussi enregistré automatiquement.</p>
+                  <div className="flex items-center justify-between gap-2 mb-2 text-xs rounded-md px-2.5 py-2" style={{ background: LIGHT, border: `1px solid ${LINE}` }}>
+                    <span style={{ color: NAVY }} className="font-semibold truncate">{archiveConfig.folderName || "Aucun dossier sélectionné"}</span>
+                    {folderHandle && (
+                      <span className="shrink-0 font-semibold" style={{ color: folderPerm === "granted" ? "#1a7f37" : ORANGE }}>
+                        {folderPerm === "granted" ? "Autorisé" : "À réactiver"}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    <button onClick={chooseArchiveFolder} className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-md" style={{ background: "#fff", color: NAVY, border: `1px solid ${LINE}` }}><FolderOpen size={13} /> Choisir un dossier…</button>
+                    {folderHandle && folderPerm !== "granted" && (
+                      <button onClick={reauthorizeFolder} className="text-xs font-semibold px-2.5 py-1.5 rounded-md text-white" style={{ background: ORANGE }}>Réactiver l'accès</button>
+                    )}
+                    {folderHandle && (
+                      <button onClick={forgetArchiveFolder} className="text-xs font-semibold px-2.5 py-1.5 rounded-md" style={{ color: "#c0392b" }}>Oublier ce dossier</button>
+                    )}
+                  </div>
+                  <label className="flex items-center gap-2 text-xs font-semibold" style={{ color: folderHandle ? NAVY : GREY }}>
+                    <input type="checkbox" checked={archiveConfig.autoSave} disabled={!folderHandle} onChange={(e) => setArchiveConfig((c) => ({ ...c, autoSave: e.target.checked }))} />
+                    Archiver automatiquement mes exports dans ce dossier
+                  </label>
+                  {archiveMsg && <p className="text-[11px] mt-2" style={{ color: GREY }}>{archiveMsg}</p>}
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}

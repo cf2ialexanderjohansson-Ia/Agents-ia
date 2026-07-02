@@ -1,4 +1,5 @@
 import XLSX from "xlsx-js-style";
+import { triggerDownload } from "./download.js";
 
 const NAVY = "15293F";
 const ORANGE = "ED6F08";
@@ -75,5 +76,8 @@ export function exportDerouleExcel(fd, filename) {
     XLSX.utils.book_append_sheet(wb, ws, "Déroulé");
   }
 
-  XLSX.writeFile(wb, filename);
+  const out = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const blob = new Blob([out], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  triggerDownload(blob, filename);
+  return blob;
 }

@@ -65,7 +65,9 @@ export async function downloadPDF(sourceEl, filename) {
         heightLeft -= ph;
       }
     }
+    const blob = pdf.output("blob");
     pdf.save(filename);
+    return blob;
   } finally {
     document.body.removeChild(wrap);
   }

@@ -226,6 +226,7 @@ const K = {
   current: "kcp:current",
   lib: "kcp:lib", // index { id: meta }
   fd: (id) => `kcp:fd:${id}`,
+  archive: "kcp:archive",
 };
 
 export const store = {
@@ -257,6 +258,11 @@ export const store = {
       localStorage.setItem(K.lib, JSON.stringify(store.list().filter((m) => m.id !== id)));
     } catch (e) { console.warn(e); }
   },
+  getArchiveConfig() {
+    try { const v = localStorage.getItem(K.archive); return v ? JSON.parse(v) : { autoSave: false, folderName: "" }; }
+    catch { return { autoSave: false, folderName: "" }; }
+  },
+  setArchiveConfig(c) { try { localStorage.setItem(K.archive, JSON.stringify(c)); } catch (e) { console.warn(e); } },
 };
 
 export function imgToDataURL(file, maxW, type, quality) {
