@@ -9,7 +9,7 @@ Chaque fiche suit la même structure : rôle, mission, périmètre, sources/entr
 | Veille | Surveille la réglementation drone/machines et les événements innovation, alerte sur les impacts | [veille.md](veille.md) |
 | Production | Produit et maintient les kits commerciaux et pédagogiques | [production.md](production.md) |
 | Projet | Pilote le développement de nouvelles offres de formation drone | [projet.md](projet.md) |
-| Pédago | Anime les groupes de formation et les sessions de formation de formateurs | [pedago.md](pedago.md) |
+| Pédago | Conçoit les programmes de formation (Qualiopi), anime les groupes et les sessions de formation de formateurs | [pedago.md](pedago.md) |
 
 ## Interactions entre agents
 
