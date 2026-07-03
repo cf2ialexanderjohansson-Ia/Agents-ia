@@ -86,7 +86,7 @@ TITRE : ${fd.titre}  DURÉE : ${fd.duree}  OBJECTIFS : ${fd.objectifs}  BRIEF : 
                 <div className="flex flex-wrap gap-2 items-center">
                   {(fd.softwareLogos || []).map((s, i) => (
                     <div key={i} className="relative rounded-md p-1.5" style={{ border: `1px solid ${LINE}`, background: "#fff" }}>
-                      <img src={s} alt="" className="h-8 object-contain" />
+                      <img src={s} alt="" className="h-11 object-contain" />
                       <button onClick={() => removeSoftware(i)} className="absolute -top-2 -right-2 rounded-full p-0.5" style={{ background: "#fff", border: `1px solid ${LINE}` }}><X size={12} color="#c0392b" /></button>
                     </div>
                   ))}
@@ -154,8 +154,8 @@ TITRE : ${fd.titre}  DURÉE : ${fd.duree}  OBJECTIFS : ${fd.objectifs}  BRIEF : 
         <div className="print-area lg:sticky lg:top-[112px] space-y-5">
           {/* PAGE 1 */}
           <div className="fd-page bg-white rounded-lg overflow-hidden shadow-sm" style={{ border: `1px solid ${LINE}` }}>
-            {/* en-tête clair avec encart photo */}
-            <div className="bg-white">
+            {/* en-tête avec encart photo */}
+            <div style={{ background: LIGHT }}>
               <div className="px-7 pt-6 flex items-start justify-between gap-4">
                 <div className="flex items-center gap-2">
                   <span style={{ width: 16, height: 2, background: ORANGE }} />
@@ -181,12 +181,12 @@ TITRE : ${fd.titre}  DURÉE : ${fd.duree}  OBJECTIFS : ${fd.objectifs}  BRIEF : 
               ))}
             </div>
             {/* corps : cartes à barre d'accent */}
-            <div className="p-5 grid grid-cols-2 gap-3">
+            <div className="p-5 grid grid-cols-2 gap-3" style={{ background: LIGHT }}>
               <AccentCard accent={A} title="Objectifs opérationnels"><Bullets items={lines(fd.objectifs)} /></AccentCard>
               <AccentCard accent={N} title="Logiciels">
                 {(fd.softwareLogos || []).length > 0 && (
                   <div className="flex flex-wrap items-center gap-3 mb-2 justify-center">
-                    {fd.softwareLogos.map((s, i) => <img key={i} src={s} alt="" className="h-9 object-contain" />)}
+                    {fd.softwareLogos.map((s, i) => <img key={i} src={s} alt="" className="h-16 object-contain" />)}
                   </div>
                 )}
                 <div className="space-y-1">
@@ -203,7 +203,7 @@ TITRE : ${fd.titre}  DURÉE : ${fd.duree}  OBJECTIFS : ${fd.objectifs}  BRIEF : 
               <AccentCard accent={A} full title="Moyens humains & matériels"><Bullets items={lines(constants.moyens)} /></AccentCard>
 
               {/* encadré satisfaction */}
-              <div className="col-span-2" style={{ background: LIGHT, border: `1px solid ${LINE}`, borderLeft: `3px solid ${ORANGE}`, borderRadius: 4, padding: 14 }}>
+              <div className="col-span-2" style={{ background: "#fff", border: `1px solid ${LINE}`, borderLeft: `3px solid ${ORANGE}`, borderRadius: 4, padding: 14 }}>
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-bold" style={{ color: NAVY, fontSize: 12 }}>Satisfaction client</span>
                   <span style={{ color: ORANGE, letterSpacing: 2 }}>★★★★★</span>
@@ -223,7 +223,7 @@ TITRE : ${fd.titre}  DURÉE : ${fd.duree}  OBJECTIFS : ${fd.objectifs}  BRIEF : 
           {/* PAGE 2 — PROGRAMME */}
           <div className="fd-page bg-white rounded-lg overflow-hidden shadow-sm" style={{ border: `1px solid ${LINE}` }}>
             <PreviewHeader constants={constants} eyebrow="PROGRAMME" code={fd.code} title={fd.titre || "Programme de la formation"} sub={fd.duree} />
-            <div className="px-7 pb-2 space-y-4">
+            <div className="px-7 py-4 space-y-4" style={{ background: LIGHT }}>
               {days.length === 0 && <p className="text-sm" style={{ color: GREY }}>Le programme s'affichera ici.</p>}
               {days.map((d, i) => (
                 <div key={i}>

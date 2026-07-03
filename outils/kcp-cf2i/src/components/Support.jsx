@@ -63,7 +63,7 @@ Style pédagogique, terminologie réglementaire exacte (STS-01, ZGU, DSAC, SORA)
 
       <div className="print-area bg-white rounded-lg overflow-hidden shadow-sm" style={{ border: `1px solid ${LINE}` }}>
         <PreviewHeader constants={constants} eyebrow="SUPPORT DE FORMATION" code={fd.code} title={fd.titre || "Support stagiaire"} sub={fd.duree} />
-        <div className="p-5 space-y-4">
+        <div className="p-5 space-y-4" style={{ background: LIGHT }}>
           {support.map((m, i) => (
             <div key={i} style={{ border: `1px solid ${LINE}`, borderLeft: `3px solid ${ORANGE}`, borderRadius: 4, background: "#fff", padding: 16 }}>
               <div className="flex items-start gap-2 mb-2">

@@ -49,9 +49,9 @@ export default function Deroule({ fd, setFd, constants }) {
 
       <div className="print-area bg-white rounded-lg overflow-hidden shadow-sm" style={{ border: `1px solid ${LINE}` }}>
         <PreviewHeader constants={constants} eyebrow="DÉROULÉ PÉDAGOGIQUE" code={fd.code} title={fd.titre || "Déroulé de la formation"} sub={fd.duree} />
-        <div className="p-5 space-y-5">
+        <div className="p-5 space-y-4" style={{ background: LIGHT }}>
           {deroule.map((day, di) => (
-            <div key={di}>
+            <div key={di} className="rounded-lg" style={{ background: "#fff", border: `1px solid ${LINE}`, padding: 14 }}>
               <div className="flex items-center gap-2 mb-2">
                 <span className="shrink-0" style={{ width: 16, height: 2, background: ORANGE }} />
                 <input value={day.title} onChange={(e) => updateDayTitle(di, e.target.value)}
