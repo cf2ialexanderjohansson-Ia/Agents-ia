@@ -47,13 +47,8 @@
   .callout p + p { margin-top: 0.5rem; }
 
   .objectives { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.65rem; }
-  .objectives li { display: flex; gap: 0.75rem; align-items: flex-start; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 0.75rem 1rem; max-width: 68ch; }
-  .objectives li::before {
-    content: ''; flex: none; width: 1.05rem; height: 1.05rem; margin-top: 0.2rem; border-radius: 4px;
-    background: #fdf1e2; border: 1.5px solid var(--orange);
-    background-image: linear-gradient(135deg, transparent 40%, var(--orange) 40% 55%, transparent 55%),
-                       linear-gradient(45deg, transparent 40%, var(--orange) 40% 55%, transparent 55%);
-  }
+  .objectives li { display: flex; gap: 0.75rem; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 0.75rem 1rem; max-width: 68ch; }
+  .obj-check { flex: none; width: 1.4rem; height: 1.4rem; border-radius: 50%; background: var(--navy); display: flex; align-items: center; justify-content: center; }
 
   .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
   @media (max-width: 780px) { .cards { grid-template-columns: 1fr; } }
@@ -131,11 +126,11 @@
   <section>
     <div class="section-head"><span class="section-head__num">01</span><h2>Objectifs pédagogiques</h2></div>
     <ul class="objectives">
-      <li>Identifier la catégorie réglementaire (Open, Specific ou Certified) applicable à un scénario de vol donné.</li>
-      <li>Citer les sous-catégories A1, A2 et A3 de la catégorie Open et leurs conditions de survol.</li>
-      <li>Expliquer les obligations déclaratives et documentaires liées à une opération en catégorie Specific.</li>
-      <li>Localiser les espaces aériens réglementés avant un vol à l'aide des outils officiels.</li>
-      <li>Décrire les responsabilités civiles et pénales du télépilote et de l'exploitant.</li>
+      <li><span class="obj-check" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Identifier la catégorie réglementaire (Open, Specific ou Certified) applicable à un scénario de vol donné.</span></li>
+      <li><span class="obj-check" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Citer les sous-catégories A1, A2 et A3 de la catégorie Open et leurs conditions de survol.</span></li>
+      <li><span class="obj-check" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Expliquer les obligations déclaratives et documentaires liées à une opération en catégorie Specific.</span></li>
+      <li><span class="obj-check" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Localiser les espaces aériens réglementés avant un vol à l'aide des outils officiels.</span></li>
+      <li><span class="obj-check" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Décrire les responsabilités civiles et pénales du télépilote et de l'exploitant.</span></li>
     </ul>
   </section>
 

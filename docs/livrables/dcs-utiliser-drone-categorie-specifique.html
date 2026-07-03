@@ -44,13 +44,8 @@
   p { max-width: 70ch; color: var(--ink-soft); }
 
   .objectives { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.65rem; }
-  .objectives li { display: flex; gap: 0.75rem; align-items: flex-start; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 0.75rem 1rem; max-width: 70ch; }
-  .objectives li::before {
-    content: ''; flex: none; width: 1.05rem; height: 1.05rem; margin-top: 0.2rem; border-radius: 4px;
-    background: #fdf1e2; border: 1.5px solid var(--orange);
-    background-image: linear-gradient(135deg, transparent 40%, var(--orange) 40% 55%, transparent 55%),
-                       linear-gradient(45deg, transparent 40%, var(--orange) 40% 55%, transparent 55%);
-  }
+  .objectives li { display: flex; gap: 0.75rem; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 0.75rem 1rem; max-width: 70ch; }
+  .obj-check { flex: none; width: 1.4rem; height: 1.4rem; border-radius: 50%; background: var(--navy); display: flex; align-items: center; justify-content: center; }
 
   .id-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
   .id-grid__item { background: var(--panel); padding: 0.9rem 1.1rem; }
@@ -108,12 +103,12 @@
   <section>
     <div class="section-head"><span class="section-head__num">01</span><h2>Objectifs pédagogiques</h2></div>
     <ul class="objectives">
-      <li>Déterminer si une opération drone relève de la catégorie Specific plutôt que Open.</li>
-      <li>Choisir la voie d'autorisation adaptée à un scénario donné (scénario standard STS, PDRA, analyse SORA ou LUC).</li>
-      <li>Réaliser une analyse de risque SORA simplifiée : détermination du GRC, de l'ARC et du niveau SAIL.</li>
-      <li>Rédiger les éléments clés d'un manuel d'exploitation (Ops Manual).</li>
-      <li>Monter un dossier de déclaration ou d'autorisation à déposer auprès de la DGAC.</li>
-      <li>Conduire une opération en catégorie Specific en sécurité, y compris la gestion des tiers et des procédures d'urgence.</li>
+      <li><span class="obj-check" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Déterminer si une opération drone relève de la catégorie Specific plutôt que Open.</span></li>
+      <li><span class="obj-check" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Choisir la voie d'autorisation adaptée à un scénario donné (scénario standard STS, PDRA, analyse SORA ou LUC).</span></li>
+      <li><span class="obj-check" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Réaliser une analyse de risque SORA simplifiée : détermination du GRC, de l'ARC et du niveau SAIL.</span></li>
+      <li><span class="obj-check" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Rédiger les éléments clés d'un manuel d'exploitation (Ops Manual).</span></li>
+      <li><span class="obj-check" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Monter un dossier de déclaration ou d'autorisation à déposer auprès de la DGAC.</span></li>
+      <li><span class="obj-check" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Conduire une opération en catégorie Specific en sécurité, y compris la gestion des tiers et des procédures d'urgence.</span></li>
     </ul>
   </section>
 
