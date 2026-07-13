@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FileText, Sparkles, Loader2, SlidersHorizontal, ImagePlus, X } from "lucide-react";
 import {
-  NAVY, NAVY2, ORANGE, LIGHT, GREY, LINE, SUBTLE, lines, parseProgramme, imgToDataURL,
+  NAVY, NAVY2, ORANGE, LIGHT, GREY, LINE, SUBTLE, CATEGORIES, lines, parseProgramme, imgToDataURL,
 } from "../store.js";
 import {
   Panel, Toggle, Field, Select, Area, Uploader, Bullets, AccentCard, DayLabel, Logo, PreviewHeader, PreviewFooter,
@@ -55,6 +55,7 @@ TITRE : ${fd.titre}  DURÉE : ${fd.duree}  OBJECTIFS : ${fd.objectifs}  BRIEF : 
   const days = parseProgramme(fd.programme);
   const prereq = lines(fd.prerequis || constants.prerequis);
   const modeval = lines(fd.modalitesEval || constants.modalitesEval);
+  const stats = (constants.satisfactionStats || {})[fd.categorie] || {};
   const A = ORANGE, N = NAVY; // accents alternés
 
   return (
@@ -106,6 +107,7 @@ TITRE : ${fd.titre}  DURÉE : ${fd.duree}  OBJECTIFS : ${fd.objectifs}  BRIEF : 
             <Select label="Niveau" v={fd.niveau} onChange={(v) => set("niveau", v)} options={["Débutant", "Intermédiaire", "Avancé", "Tous niveaux"]} />
             <Field label="Modalité" v={fd.modalite} onChange={(v) => set("modalite", v)} placeholder="Présentiel / distanciel" />
             <Field label="Format" v={fd.format} onChange={(v) => set("format", v)} placeholder="Inter · 3 à 5 pers." />
+            <Select label="Catégorie (stats stagiaires)" v={fd.categorie} onChange={(v) => set("categorie", v)} options={CATEGORIES} />
           </div>
           <Field label="Titre" v={fd.titre} onChange={(v) => set("titre", v)} placeholder="Intitulé" />
           <Area label="Accroche" v={fd.accroche} onChange={(v) => set("accroche", v)} rows={3} />
@@ -134,13 +136,25 @@ TITRE : ${fd.titre}  DURÉE : ${fd.duree}  OBJECTIFS : ${fd.objectifs}  BRIEF : 
               <Area label="Modalités d'évaluation par défaut" v={constants.modalitesEval} onChange={(v) => setC({ ...constants, modalitesEval: v })} rows={2} />
               <Area label="Accessibilité" v={constants.accessibilite} onChange={(v) => setC({ ...constants, accessibilite: v })} rows={2} />
               <Area label="Dates des sessions" v={constants.sessionsInfo} onChange={(v) => setC({ ...constants, sessionsInfo: v })} rows={1} />
-              <div className="grid grid-cols-4 gap-2">
-                <Field label="Stagiaires" v={constants.nbStagiaires} onChange={(v) => setC({ ...constants, nbStagiaires: v })} />
-                <Field label="Objectifs" v={constants.tauxObjectifs} onChange={(v) => setC({ ...constants, tauxObjectifs: v })} />
-                <Field label="Satisfaction" v={constants.satisfaction} onChange={(v) => setC({ ...constants, satisfaction: v })} />
-                <Field label="Certification" v={constants.certification} onChange={(v) => setC({ ...constants, certification: v })} />
-              </div>
-              <Area label="Période de référence" v={constants.periode} onChange={(v) => setC({ ...constants, periode: v })} rows={2} />
+
+              <div className="text-[11px] font-semibold pt-1" style={{ color: GREY }}>Satisfaction stagiaires — par catégorie</div>
+              {CATEGORIES.map((cat) => {
+                const s = (constants.satisfactionStats || {})[cat] || {};
+                const setStat = (k, v) => setC({ ...constants, satisfactionStats: { ...constants.satisfactionStats, [cat]: { ...s, [k]: v } } });
+                return (
+                  <div key={cat} className="rounded-md p-2" style={{ border: `1px solid ${LINE}` }}>
+                    <div className="text-[11px] font-bold mb-1" style={{ color: NAVY }}>{cat}</div>
+                    <div className="grid grid-cols-4 gap-2">
+                      <Field label="Stagiaires" v={s.nbStagiaires} onChange={(v) => setStat("nbStagiaires", v)} />
+                      <Field label="Objectifs" v={s.tauxObjectifs} onChange={(v) => setStat("tauxObjectifs", v)} />
+                      <Field label="Satisfaction" v={s.satisfaction} onChange={(v) => setStat("satisfaction", v)} />
+                      <Field label="Certification" v={s.certification} onChange={(v) => setStat("certification", v)} />
+                    </div>
+                    <Area label="Note / période de référence" v={s.note} onChange={(v) => setStat("note", v)} rows={2} />
+                  </div>
+                );
+              })}
+
               <div className="grid grid-cols-2 gap-2">
                 <Field label="Téléphone" v={constants.tel} onChange={(v) => setC({ ...constants, tel: v })} />
                 <Field label="Email" v={constants.email} onChange={(v) => setC({ ...constants, email: v })} />
@@ -207,16 +221,16 @@ TITRE : ${fd.titre}  DURÉE : ${fd.duree}  OBJECTIFS : ${fd.objectifs}  BRIEF : 
               {/* encadré satisfaction */}
               <div className="col-span-2" style={{ background: "#fff", border: `1px solid ${LINE}`, borderLeft: `3px solid ${ORANGE}`, borderRadius: 4, padding: 14 }}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold" style={{ color: NAVY, fontSize: 12 }}>Satisfaction client</span>
+                  <span className="font-bold" style={{ color: NAVY, fontSize: 12 }}>Satisfaction stagiaires — {fd.categorie}</span>
                   <span style={{ color: ORANGE, letterSpacing: 2 }}>★★★★★</span>
                 </div>
                 <div className="grid grid-cols-4 gap-2 text-center">
-                  <Stat n={constants.nbStagiaires} l="Stagiaires formés" />
-                  <Stat n={constants.tauxObjectifs} l="Atteinte des objectifs" />
-                  <Stat n={constants.satisfaction} l="Satisfaction stagiaires" />
-                  <Stat n={constants.certification} l="Réussite certification" />
+                  <Stat n={stats.nbStagiaires} l="Stagiaires formés" />
+                  <Stat n={stats.tauxObjectifs} l="Atteinte des objectifs" />
+                  <Stat n={stats.satisfaction} l="Satisfaction stagiaires" />
+                  <Stat n={stats.certification} l="Réussite certification" />
                 </div>
-                <p className="text-[8px] mt-2" style={{ color: GREY }}>{constants.periode}</p>
+                {lines(stats.note).map((l, i) => <p key={i} className="text-[8px] mt-1" style={{ color: GREY }}>{l}</p>)}
               </div>
             </div>
             <PreviewFooter constants={constants} doc="Fiche descriptive" />

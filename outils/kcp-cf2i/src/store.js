@@ -8,6 +8,11 @@ export const GREY = "#6B7A8D";
 export const LINE = "#E5E9EF";
 export const SUBTLE = "#96A9BE";
 
+export const CATEGORIES = ["Drone Réglementaire", "Drone Pratique", "Drone Scan 3D"];
+
+const noteFor = (categorie) =>
+  `Période de référence : du 1er janvier 2024 au 31 mai 2026\n(1) : ayant suivi une formation ${categorie}\n(2) : totalement ou partiellement atteint (auto-évaluation des stagiaires)\n(3) : très satisfait ou plutôt satisfait (questionnaire de satisfaction)`;
+
 export const DEFAULT_CONSTANTS = {
   logo: "",
   prerequis:
@@ -23,11 +28,11 @@ export const DEFAULT_CONSTANTS = {
   accessibilite:
     "Conformément à la réglementation (loi du 11/02/2005), CF2i peut proposer des aménagements techniques, organisationnels, et/ou pédagogiques pour répondre aux besoins particuliers de personnes en situation de handicap.",
   sessionsInfo: "Planning des sessions par centre sur www.cf2i-formation.fr",
-  nbStagiaires: "360",
-  periode: "Période de référence : du 1ᵉʳ janvier 2024 au 31 mai 2026.",
-  tauxObjectifs: "100 %",
-  satisfaction: "96 %",
-  certification: "91 %",
+  satisfactionStats: {
+    "Drone Réglementaire": { nbStagiaires: "390", tauxObjectifs: "100 %", satisfaction: "100 %", certification: "", note: noteFor("Drone Réglementaire") },
+    "Drone Pratique": { nbStagiaires: "360", tauxObjectifs: "100 %", satisfaction: "96 %", certification: "91 %", note: noteFor("Drone Pratique") },
+    "Drone Scan 3D": { nbStagiaires: "27", tauxObjectifs: "100 %", satisfaction: "98 %", certification: "", note: noteFor("Drone Scan 3D") },
+  },
   tel: "09 72 10 74 94",
   email: "drone@cf2i.fr",
   legal:
@@ -79,6 +84,7 @@ JOUR 3 — Pratique avancée & évaluation
 
 export const EXAMPLE = {
   code: "DP-DAG-A",
+  categorie: "Drone Pratique",
   titre: "Pratique du drone pour la pulvérisation agricole",
   accroche:
     "Formation dédiée à la maîtrise des drones professionnels et à la spécialisation en pulvérisation par drone. Elle s'adresse aux professionnels du secteur agricole souhaitant intégrer la pulvérisation par drone dans leurs pratiques, en toute sécurité et conformité réglementaire.",
@@ -101,7 +107,7 @@ export const EXAMPLE = {
 };
 
 export const blankFD = () => ({
-  code: "", titre: "", accroche: "", duree: "", modalite: "Présentiel / distanciel",
+  code: "", categorie: "Drone Pratique", titre: "", accroche: "", duree: "", modalite: "Présentiel / distanciel",
   format: "", niveau: "Débutant", hero: "", softwareLogos: [], objectifs: "",
   logiciels: "", prerequis: "", modalitesEval: "", programme: "", deroule: null, support: null,
 });

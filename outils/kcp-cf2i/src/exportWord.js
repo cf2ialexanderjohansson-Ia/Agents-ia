@@ -92,6 +92,20 @@ function contactLine(text, bold) {
   });
 }
 
+const greyLine = { style: BorderStyle.SINGLE, size: 2, color: "D9D9D9" };
+const statBorders = { top: greyLine, bottom: greyLine, left: greyLine, right: greyLine, insideHorizontal: greyLine, insideVertical: greyLine };
+
+function statCell(n, label) {
+  return new TableCell({
+    width: { size: 25, type: WidthType.PERCENTAGE },
+    verticalAlign: VerticalAlign.CENTER,
+    children: [
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 20 }, children: [new TextRun({ text: n || "—", bold: true, color: ORANGE, size: 28, font: FONT })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: label, color: GREY, size: 14, font: FONT })] }),
+    ],
+  });
+}
+
 // grille 2 colonnes : chaque entrée de `items` est un tableau de Paragraph
 // (titre + puces d'une section), placé côte à côte par paire.
 function gridCell(paragraphs, { withGutter }) {
@@ -196,6 +210,30 @@ export async function exportFicheDescriptiveWord(fd, constants, filename) {
       [sectionHeading("Moyens humains et matériels", GREY), ...bulletList(lines(constants.moyens))],
     ])
   );
+
+  // satisfaction stagiaires (selon la catégorie de la formation)
+  const stats = (constants.satisfactionStats || {})[fd.categorie] || {};
+  children.push(sectionHeading(`Satisfaction stagiaires${fd.categorie ? " — " + fd.categorie : ""}`, GREY));
+  children.push(
+    new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      borders: statBorders,
+      rows: [
+        new TableRow({
+          children: [
+            statCell(stats.nbStagiaires, "Stagiaires formés"),
+            statCell(stats.tauxObjectifs, "Atteinte des objectifs"),
+            statCell(stats.satisfaction, "Satisfaction stagiaires"),
+            statCell(stats.certification, "Réussite certification"),
+          ],
+        }),
+      ],
+    })
+  );
+  lines(stats.note).forEach((l) =>
+    children.push(new Paragraph({ spacing: { after: 20 }, children: [new TextRun({ text: l, color: GREY, size: 14, font: FONT })] }))
+  );
+  children.push(new Paragraph({ text: "" }));
 
   // bandeau contact (fond navy plein largeur, texte blanc centré)
   children.push(
