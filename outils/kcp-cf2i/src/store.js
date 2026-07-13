@@ -20,6 +20,9 @@ export const DEFAULT_CONSTANTS = {
     "Matériel drone complet pour l'apprentissage et la découverte\nEspaces de vol pour exercices d'apprentissage et d'entraînement\nTravaux pratiques : prise en main et mise en situation réelle",
   moyens:
     "Formateur CF2i télépilote avec expérience significative ; support stagiaire remis en début de stage\nDrones écoles, drones d'entraînement, simulateurs de vol et plateforme de révision en ligne\nCf. Fiche Modalité Pratique de Formation Drone (FMPFD)",
+  accessibilite:
+    "Conformément à la réglementation (loi du 11/02/2005), CF2i peut proposer des aménagements techniques, organisationnels, et/ou pédagogiques pour répondre aux besoins particuliers de personnes en situation de handicap.",
+  sessionsInfo: "Planning des sessions par centre sur www.cf2i-formation.fr",
   nbStagiaires: "360",
   periode: "Période de référence : du 1ᵉʳ janvier 2024 au 31 mai 2026.",
   tauxObjectifs: "100 %",

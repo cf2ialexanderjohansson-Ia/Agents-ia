@@ -1,75 +1,94 @@
 import {
-  Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell,
+  Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
   WidthType, BorderStyle, AlignmentType, ShadingType, ImageRun, PageBreak,
+  Header, VerticalAlign,
 } from "docx";
 import { lines, parseProgramme } from "./store.js";
 import { triggerDownload } from "./download.js";
 
-const NAVY = "15293F";
-const ORANGE = "ED6F08";
-const GREY = "6B7A8D";
-const LINE = "E5E9EF";
-const LIGHT = "F4F6F8";
+// Palette et gabarit repris à l'identique du template Word CF2i (FD-*.docx)
+const NAVY = "1A3566";
+const DARKNAVY = "002060";
+const ORANGE = "FF6600";
+const GREY = "7A7A7A";
+const WHITE = "FFFFFF";
+const FONT = "Arial";
+const FONT_TITLE = "Arial Black";
 
-const noBorder = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
-const cellBorders = { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder };
+const noBorder = { style: BorderStyle.NONE, size: 0, color: WHITE };
+const noCellBorders = { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder };
+const tableLine = { style: BorderStyle.SINGLE, size: 4, color: NAVY };
+const tableBorders = { top: tableLine, bottom: tableLine, left: tableLine, right: tableLine, insideHorizontal: tableLine, insideVertical: tableLine };
 
-function eyebrow(text) {
+function dataUrlToUint8Array(dataUrl) {
+  return fetch(dataUrl).then((r) => r.arrayBuffer()).then((b) => new Uint8Array(b));
+}
+
+function loadImageSize(dataUrl) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve({ w: img.naturalWidth || 100, h: img.naturalHeight || 100 });
+    img.onerror = () => resolve({ w: 100, h: 100 });
+    img.src = dataUrl;
+  });
+}
+
+// "FD - Bleu" / "FD - Orange" / "FD - Gris" : titre de section coloré, sans bandeau
+function sectionHeading(text, color) {
   return new Paragraph({
-    spacing: { after: 80 },
-    children: [new TextRun({ text: text.toUpperCase(), bold: true, color: ORANGE, size: 16, characterSpacing: 20 })],
+    spacing: { before: 240, after: 120 },
+    indent: { left: 200 },
+    children: [new TextRun({ text, bold: true, color, size: 20, font: FONT })],
   });
 }
 
-function h1(text) {
+// "FD - Titre Contenu" / "FD - Jour contenu" : bandeau plein fond coloré, texte blanc centré
+function band(text, { fill, size = 22, before = 240 }) {
   return new Paragraph({
-    heading: HeadingLevel.HEADING_1,
-    spacing: { after: 160 },
-    children: [new TextRun({ text, bold: true, color: NAVY, size: 34 })],
+    shading: { type: ShadingType.CLEAR, fill },
+    alignment: AlignmentType.CENTER,
+    spacing: { before, after: 120 },
+    children: [new TextRun({ text: (text || "").toUpperCase(), bold: true, color: WHITE, size, font: FONT })],
   });
 }
 
-function sectionTitle(text) {
+// "FD - Puces Page 1" / "FD - Puces contenu" : puce justifiée
+function bulletP(text, after = 80) {
   return new Paragraph({
-    spacing: { before: 200, after: 80 },
-    children: [new TextRun({ text, bold: true, color: NAVY, size: 22 })],
+    bullet: { level: 0 },
+    alignment: AlignmentType.JUSTIFIED,
+    spacing: { after },
+    children: [new TextRun({ text, size: 20, font: FONT })],
   });
 }
 
-function bulletList(items) {
-  if (!items || items.length === 0) {
-    return [new Paragraph({ children: [new TextRun({ text: "—", color: GREY, size: 20 })] })];
-  }
-  return items.map(
-    (it) => new Paragraph({ bullet: { level: 0 }, spacing: { after: 40 }, children: [new TextRun({ text: it, size: 20 })] })
-  );
+function bulletList(items, after = 80) {
+  if (!items || items.length === 0) return [bulletP("—", after)];
+  return items.map((it) => bulletP(it, after));
 }
 
-function metaRow(cells) {
-  return new TableRow({
-    children: cells.map(
-      ([k, v]) =>
-        new TableCell({
-          borders: cellBorders,
-          shading: { type: ShadingType.CLEAR, fill: LIGHT },
-          margins: { top: 100, bottom: 100, left: 120, right: 120 },
-          children: [
-            new Paragraph({ children: [new TextRun({ text: k.toUpperCase(), bold: true, color: GREY, size: 14, characterSpacing: 10 })] }),
-            new Paragraph({ children: [new TextRun({ text: v || "—", bold: true, color: NAVY, size: 20 })] }),
-          ],
-        })
-    ),
-  });
-}
-
-function statCell(n, l) {
+function metaHeaderCell(text, width) {
   return new TableCell({
-    borders: cellBorders,
-    margins: { top: 80, bottom: 80, left: 80, right: 80 },
-    children: [
-      new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: n || "—", bold: true, color: ORANGE, size: 26 })] }),
-      new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: l, color: GREY, size: 14 })] }),
-    ],
+    width: { size: width, type: WidthType.PERCENTAGE },
+    shading: { type: ShadingType.CLEAR, fill: NAVY },
+    verticalAlign: VerticalAlign.CENTER,
+    children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text, bold: true, color: WHITE, size: 20, font: FONT })] })],
+  });
+}
+function metaDataCell(text, width) {
+  return new TableCell({
+    width: { size: width, type: WidthType.PERCENTAGE },
+    verticalAlign: VerticalAlign.CENTER,
+    children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: text || "—", size: 20, font: FONT })] })],
+  });
+}
+
+function contactLine(text, bold) {
+  return new Paragraph({
+    shading: { type: ShadingType.CLEAR, fill: NAVY },
+    alignment: AlignmentType.CENTER,
+    spacing: { before: 0, after: 0 },
+    children: [new TextRun({ text, bold: !!bold, color: WHITE, size: 20, font: FONT })],
   });
 }
 
@@ -78,96 +97,118 @@ export async function exportFicheDescriptiveWord(fd, constants, filename) {
   const prereq = lines(fd.prerequis || constants.prerequis);
   const modeval = lines(fd.modalitesEval || constants.modalitesEval);
 
-  const logicielsParas = lines(fd.logiciels).map((it) => {
-    const [name, ...rest] = it.split("—");
-    return new Paragraph({
-      bullet: { level: 0 },
-      spacing: { after: 40 },
-      children: [
-        new TextRun({ text: name.trim(), bold: true, color: NAVY, size: 20 }),
-        ...(rest.length ? [new TextRun({ text: " — " + rest.join("—").trim(), color: GREY, size: 20 })] : []),
-      ],
-    });
+  // ---- en-tête (logo + eyebrow + titre), répété sur chaque page ----
+  let logoRun = null;
+  if (constants.logo) {
+    try {
+      const [data, size] = await Promise.all([dataUrlToUint8Array(constants.logo), loadImageSize(constants.logo)]);
+      const h = 60, w = Math.round(h * (size.w / size.h || 1));
+      const type = constants.logo.startsWith("data:image/jpeg") ? "jpg" : "png";
+      logoRun = new ImageRun({ type, data, transformation: { width: w, height: h } });
+    } catch { /* logo illisible : en-tête sans logo */ }
+  }
+
+  const headerTable = new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    borders: noCellBorders,
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            width: { size: 80, type: WidthType.PERCENTAGE },
+            borders: noCellBorders,
+            children: [
+              new Paragraph({
+                children: [
+                  new TextRun({ text: "Fiche descriptive", bold: true, color: ORANGE, font: FONT_TITLE, size: 32 }),
+                  new TextRun({ text: fd.code ? `  ${fd.code}` : "", bold: true, color: ORANGE, font: FONT_TITLE, size: 32 }),
+                ],
+              }),
+              new Paragraph({
+                children: [new TextRun({ text: fd.titre || "Intitulé de la formation", bold: true, color: NAVY, font: FONT_TITLE, size: 32 })],
+              }),
+            ],
+          }),
+          new TableCell({
+            width: { size: 20, type: WidthType.PERCENTAGE },
+            borders: noCellBorders,
+            verticalAlign: VerticalAlign.TOP,
+            children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: logoRun ? [logoRun] : [] })],
+          }),
+        ],
+      }),
+    ],
   });
 
-  const children = [
-    eyebrow(`Fiche descriptive${fd.code ? " · " + fd.code : ""}`),
-    h1(fd.titre || "Intitulé de la formation"),
-  ];
+  const header = new Header({ children: [headerTable] });
+
+  const children = [];
 
   if (fd.accroche) {
-    children.push(new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: fd.accroche, color: "374350", size: 20 })] }));
+    children.push(new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: fd.accroche, size: 20, font: FONT })] }));
   }
 
   children.push(
     new Table({
       width: { size: 100, type: WidthType.PERCENTAGE },
-      rows: [metaRow([["Durée", fd.duree], ["Modalité", fd.modalite], ["Format", fd.format], ["Niveau", fd.niveau]])],
-    })
-  );
-
-  children.push(sectionTitle("Objectifs opérationnels"), ...bulletList(lines(fd.objectifs)));
-  children.push(sectionTitle("Logiciels"), ...(logicielsParas.length ? logicielsParas : bulletList([])));
-  children.push(sectionTitle("Prérequis"), ...bulletList(prereq));
-  children.push(sectionTitle("Modalités d'évaluation"), ...bulletList(modeval));
-  children.push(sectionTitle("Accès, délais & accessibilité"), ...bulletList(lines(constants.acces)));
-  children.push(sectionTitle("Méthodes mobilisées"), ...bulletList(lines(constants.methodes)));
-  children.push(sectionTitle("Moyens humains & matériels"), ...bulletList(lines(constants.moyens)));
-
-  children.push(sectionTitle("Satisfaction client"));
-  children.push(
-    new Table({
-      width: { size: 100, type: WidthType.PERCENTAGE },
+      borders: tableBorders,
       rows: [
-        new TableRow({
-          children: [
-            statCell(constants.nbStagiaires, "Stagiaires formés"),
-            statCell(constants.tauxObjectifs, "Atteinte des objectifs"),
-            statCell(constants.satisfaction, "Satisfaction stagiaires"),
-            statCell(constants.certification, "Réussite certification"),
-          ],
-        }),
+        new TableRow({ children: [metaHeaderCell("Durée totale", 21), metaHeaderCell("Type", 32), metaHeaderCell("Niveau d'entrée", 47)] }),
+        new TableRow({ children: [metaDataCell(fd.duree, 21), metaDataCell(fd.format, 32), metaDataCell(fd.niveau, 47)] }),
       ],
     })
   );
-  if (constants.periode) {
-    children.push(new Paragraph({ spacing: { before: 100 }, children: [new TextRun({ text: constants.periode, color: GREY, size: 16 })] }));
-  }
+  children.push(new Paragraph({ text: "" }));
 
-  // Page 2 — programme
+  children.push(sectionHeading("Objectifs opérationnels", NAVY), ...bulletList(lines(fd.objectifs)));
+  children.push(sectionHeading("Prérequis", NAVY), ...bulletList(prereq));
+  children.push(sectionHeading("Modalité et délai d'accès", NAVY), ...bulletList(lines(constants.acces)));
+  children.push(sectionHeading("Méthodes mobilisées", ORANGE), ...bulletList(lines(constants.methodes)));
+  children.push(sectionHeading("Modalités d'évaluation", ORANGE), ...bulletList(modeval));
+  children.push(sectionHeading("Accessibilité", ORANGE), ...bulletList(lines(constants.accessibilite)));
+  children.push(sectionHeading("Dates des sessions de formation", GREY), ...bulletList(lines(constants.sessionsInfo)));
+  children.push(sectionHeading("Moyens humains et matériels", GREY), ...bulletList(lines(constants.moyens)));
+
+  // bandeau contact (fond navy plein largeur, texte blanc centré)
+  children.push(
+    contactLine("Pour toute question administrative, pédagogique et/ou handicap :", true),
+    contactLine("Service commercial", true),
+    contactLine(constants.tel, false),
+    contactLine(constants.email, false)
+  );
+
+  // page 2 — contenu de la formation
   children.push(new Paragraph({ children: [new PageBreak()] }));
-  children.push(eyebrow(`Programme${fd.code ? " · " + fd.code : ""}`));
-  children.push(h1(fd.titre || "Programme de la formation"));
-  if (fd.duree) children.push(new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: fd.duree, color: GREY, size: 20 })] }));
+  children.push(
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 200, after: 300 },
+      children: [new TextRun({ text: "Contenu de la formation", bold: true, color: NAVY, font: FONT_TITLE, size: 24 })],
+    })
+  );
 
   if (days.length === 0) {
-    children.push(new Paragraph({ children: [new TextRun({ text: "Le programme s'affichera ici.", color: GREY, size: 20 })] }));
+    children.push(new Paragraph({ children: [new TextRun({ text: "Le programme s'affichera ici.", color: GREY, size: 20, font: FONT })] }));
   }
   days.forEach((d, i) => {
-    children.push(
-      new Paragraph({
-        spacing: { before: 240, after: 100 },
-        children: [new TextRun({ text: (d.title || `Jour ${i + 1}`).toUpperCase(), bold: true, color: NAVY, size: 22, characterSpacing: 10 })],
-      })
-    );
+    children.push(band(d.title || `Jour ${i + 1}`, { fill: NAVY, size: 22, before: i === 0 ? 0 : 360 }));
     d.sections.forEach((s) => {
-      if (s.title) children.push(sectionTitle(s.title));
-      children.push(...bulletList(s.bullets));
+      if (s.title) children.push(band(s.title, { fill: DARKNAVY, size: 23, before: 240 }));
+      children.push(...bulletList(s.bullets, 34));
     });
   });
 
-  // pied de page
-  children.push(
-    new Paragraph({
-      spacing: { before: 300 },
-      border: { top: { style: BorderStyle.SINGLE, size: 4, color: LINE } },
-      children: [new TextRun({ text: `Contact : ${constants.tel} · ${constants.email}`, bold: true, color: NAVY, size: 16 })],
-    }),
-    new Paragraph({ children: [new TextRun({ text: constants.legal, color: GREY, size: 14 })] })
-  );
-
   const doc = new Document({
-    sections: [{ properties: {}, children }],
+    sections: [{
+      properties: {
+        page: {
+          size: { width: 11906, height: 16838 }, // A4
+          margin: { top: 1500, bottom: 850, left: 850, right: 850 },
+        },
+      },
+      headers: { default: header },
+      children,
+    }],
   });
 
   const blob = await Packer.toBlob(doc);

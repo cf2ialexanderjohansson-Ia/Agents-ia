@@ -132,6 +132,8 @@ TITRE : ${fd.titre}  DURÉE : ${fd.duree}  OBJECTIFS : ${fd.objectifs}  BRIEF : 
               <Area label="Moyens humains & matériels" v={constants.moyens} onChange={(v) => setC({ ...constants, moyens: v })} rows={3} />
               <Area label="Prérequis par défaut" v={constants.prerequis} onChange={(v) => setC({ ...constants, prerequis: v })} rows={2} />
               <Area label="Modalités d'évaluation par défaut" v={constants.modalitesEval} onChange={(v) => setC({ ...constants, modalitesEval: v })} rows={2} />
+              <Area label="Accessibilité" v={constants.accessibilite} onChange={(v) => setC({ ...constants, accessibilite: v })} rows={2} />
+              <Area label="Dates des sessions" v={constants.sessionsInfo} onChange={(v) => setC({ ...constants, sessionsInfo: v })} rows={1} />
               <div className="grid grid-cols-4 gap-2">
                 <Field label="Stagiaires" v={constants.nbStagiaires} onChange={(v) => setC({ ...constants, nbStagiaires: v })} />
                 <Field label="Objectifs" v={constants.tauxObjectifs} onChange={(v) => setC({ ...constants, tauxObjectifs: v })} />
