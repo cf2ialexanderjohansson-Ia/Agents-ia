@@ -92,6 +92,30 @@ function contactLine(text, bold) {
   });
 }
 
+// grille 2 colonnes : chaque entrée de `items` est un tableau de Paragraph
+// (titre + puces d'une section), placé côte à côte par paire.
+function gridCell(paragraphs, { withGutter }) {
+  return new TableCell({
+    width: { size: 50, type: WidthType.PERCENTAGE },
+    borders: noCellBorders,
+    verticalAlign: VerticalAlign.TOP,
+    margins: withGutter ? { right: 200 } : undefined,
+    children: paragraphs,
+  });
+}
+function emptyCell() {
+  return new TableCell({ width: { size: 50, type: WidthType.PERCENTAGE }, borders: noCellBorders, children: [new Paragraph({ text: "" })] });
+}
+function twoColGrid(items) {
+  const rows = [];
+  for (let i = 0; i < items.length; i += 2) {
+    const left = gridCell(items[i], { withGutter: true });
+    const right = items[i + 1] ? gridCell(items[i + 1], { withGutter: false }) : emptyCell();
+    rows.push(new TableRow({ children: [left, right] }));
+  }
+  return new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, borders: noCellBorders, rows });
+}
+
 export async function exportFicheDescriptiveWord(fd, constants, filename) {
   const days = parseProgramme(fd.programme);
   const prereq = lines(fd.prerequis || constants.prerequis);
@@ -160,14 +184,18 @@ export async function exportFicheDescriptiveWord(fd, constants, filename) {
   );
   children.push(new Paragraph({ text: "" }));
 
-  children.push(sectionHeading("Objectifs opérationnels", NAVY), ...bulletList(lines(fd.objectifs)));
-  children.push(sectionHeading("Prérequis", NAVY), ...bulletList(prereq));
-  children.push(sectionHeading("Modalité et délai d'accès", NAVY), ...bulletList(lines(constants.acces)));
-  children.push(sectionHeading("Méthodes mobilisées", ORANGE), ...bulletList(lines(constants.methodes)));
-  children.push(sectionHeading("Modalités d'évaluation", ORANGE), ...bulletList(modeval));
-  children.push(sectionHeading("Accessibilité", ORANGE), ...bulletList(lines(constants.accessibilite)));
-  children.push(sectionHeading("Dates des sessions de formation", GREY), ...bulletList(lines(constants.sessionsInfo)));
-  children.push(sectionHeading("Moyens humains et matériels", GREY), ...bulletList(lines(constants.moyens)));
+  children.push(
+    twoColGrid([
+      [sectionHeading("Objectifs opérationnels", NAVY), ...bulletList(lines(fd.objectifs))],
+      [sectionHeading("Prérequis", NAVY), ...bulletList(prereq)],
+      [sectionHeading("Modalité et délai d'accès", NAVY), ...bulletList(lines(constants.acces))],
+      [sectionHeading("Méthodes mobilisées", ORANGE), ...bulletList(lines(constants.methodes))],
+      [sectionHeading("Modalités d'évaluation", ORANGE), ...bulletList(modeval)],
+      [sectionHeading("Accessibilité", ORANGE), ...bulletList(lines(constants.accessibilite))],
+      [sectionHeading("Dates des sessions de formation", GREY), ...bulletList(lines(constants.sessionsInfo))],
+      [sectionHeading("Moyens humains et matériels", GREY), ...bulletList(lines(constants.moyens))],
+    ])
+  );
 
   // bandeau contact (fond navy plein largeur, texte blanc centré)
   children.push(
@@ -192,10 +220,14 @@ export async function exportFicheDescriptiveWord(fd, constants, filename) {
   }
   days.forEach((d, i) => {
     children.push(band(d.title || `Jour ${i + 1}`, { fill: NAVY, size: 22, before: i === 0 ? 0 : 360 }));
-    d.sections.forEach((s) => {
-      if (s.title) children.push(band(s.title, { fill: DARKNAVY, size: 23, before: 240 }));
-      children.push(...bulletList(s.bullets, 34));
-    });
+    children.push(
+      twoColGrid(
+        d.sections.map((s) => [
+          ...(s.title ? [band(s.title, { fill: DARKNAVY, size: 23, before: 0 })] : []),
+          ...bulletList(s.bullets, 34),
+        ])
+      )
+    );
   });
 
   const doc = new Document({
