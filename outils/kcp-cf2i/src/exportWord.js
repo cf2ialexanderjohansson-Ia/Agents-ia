@@ -198,6 +198,16 @@ export async function exportFicheDescriptiveWord(fd, constants, filename) {
   );
   children.push(new Paragraph({ text: "" }));
 
+  // bandeau contact (déplacé dans la grille, en colonne, plutôt qu'en bloc
+  // plein largeur isolé en bas de page — un petit bloc seul juste avant le
+  // saut de page pouvait déborder seul sur une page presque blanche)
+  const contactCell = [
+    contactLine("Pour toute question administrative, pédagogique et/ou handicap :", true),
+    contactLine("Service commercial", true),
+    contactLine(constants.tel, false),
+    contactLine(constants.email, false),
+  ];
+
   children.push(
     twoColGrid([
       [sectionHeading("Objectifs opérationnels", NAVY), ...bulletList(lines(fd.objectifs))],
@@ -208,6 +218,7 @@ export async function exportFicheDescriptiveWord(fd, constants, filename) {
       [sectionHeading("Accessibilité", ORANGE), ...bulletList(lines(constants.accessibilite))],
       [sectionHeading("Dates des sessions de formation", GREY), ...bulletList(lines(constants.sessionsInfo))],
       [sectionHeading("Moyens humains et matériels", GREY), ...bulletList(lines(constants.moyens))],
+      contactCell,
     ])
   );
 
@@ -234,14 +245,6 @@ export async function exportFicheDescriptiveWord(fd, constants, filename) {
     children.push(new Paragraph({ spacing: { after: 20 }, children: [new TextRun({ text: l, color: GREY, size: 14, font: FONT })] }))
   );
   children.push(new Paragraph({ text: "" }));
-
-  // bandeau contact (fond navy plein largeur, texte blanc centré)
-  children.push(
-    contactLine("Pour toute question administrative, pédagogique et/ou handicap :", true),
-    contactLine("Service commercial", true),
-    contactLine(constants.tel, false),
-    contactLine(constants.email, false)
-  );
 
   // page 2 — contenu de la formation
   // (pageBreakBefore sur le titre plutôt qu'un paragraphe de saut de page à
