@@ -1,6 +1,6 @@
 import {
   Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-  WidthType, BorderStyle, AlignmentType, ShadingType, ImageRun, PageBreak,
+  WidthType, BorderStyle, AlignmentType, ShadingType, ImageRun,
   Header, VerticalAlign,
 } from "docx";
 import { lines, parseProgramme } from "./store.js";
@@ -244,11 +244,14 @@ export async function exportFicheDescriptiveWord(fd, constants, filename) {
   );
 
   // page 2 — contenu de la formation
-  children.push(new Paragraph({ children: [new PageBreak()] }));
+  // (pageBreakBefore sur le titre plutôt qu'un paragraphe de saut de page à
+  // part : un paragraphe ne contenant qu'un saut fait parfois apparaître une
+  // page blanche fantôme dans Word selon le contenu qui précède.)
   children.push(
     new Paragraph({
+      pageBreakBefore: true,
       alignment: AlignmentType.CENTER,
-      spacing: { before: 200, after: 300 },
+      spacing: { before: 0, after: 300 },
       children: [new TextRun({ text: "Contenu de la formation", bold: true, color: NAVY, font: FONT_TITLE, size: 24 })],
     })
   );
@@ -267,6 +270,9 @@ export async function exportFicheDescriptiveWord(fd, constants, filename) {
       )
     );
   });
+  // le corps ne doit jamais se terminer sur un tableau (source connue de
+  // page blanche fantôme en fin de document dans Word)
+  children.push(new Paragraph({ text: "" }));
 
   const doc = new Document({
     sections: [{
