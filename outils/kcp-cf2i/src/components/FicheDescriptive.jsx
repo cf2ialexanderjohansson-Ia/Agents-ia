@@ -167,7 +167,7 @@ TITRE : ${fd.titre}  DURÉE : ${fd.duree}  OBJECTIFS : ${fd.objectifs}  BRIEF : 
 
       {/* ----------------- APERÇU ----------------- */}
       <div>
-        <div className="print-area lg:sticky lg:top-[112px] space-y-5">
+        <div className="print-area lg:sticky lg:top-6 space-y-5">
           {/* PAGE 1 */}
           <div className="fd-page bg-white rounded-lg overflow-hidden shadow-sm" style={{ border: `1px solid ${LINE}` }}>
             {/* en-tête avec encart photo */}

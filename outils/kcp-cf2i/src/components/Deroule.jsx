@@ -29,10 +29,12 @@ export default function Deroule({ fd, setFd, constants }) {
 
   if (!deroule) {
     return (
-      <div className="bg-white rounded-lg p-10 text-center shadow-sm max-w-2xl mx-auto" style={{ border: `1px solid ${LINE}` }}>
-        <Clock size={32} style={{ color: GREY }} className="mx-auto mb-3" />
+      <div className="bg-white rounded-xl p-12 text-center max-w-2xl mx-auto" style={{ border: `1px dashed #C7CFDA` }}>
+        <div className="inline-flex items-center justify-center rounded-full mb-3" style={{ width: 52, height: 52, background: LIGHT }}>
+          <Clock size={22} style={{ color: GREY }} />
+        </div>
         <p className="mb-4" style={{ color: GREY }}>Le déroulé pédagogique se construit automatiquement à partir du programme saisi dans la fiche descriptive (horaires, séquences, méthodes), puis reste entièrement modifiable.</p>
-        <button onClick={generate} disabled={!(fd.programme || "").trim()} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white px-4 py-2 rounded-md disabled:opacity-50" style={{ background: ORANGE }}>
+        <button onClick={generate} disabled={!(fd.programme || "").trim()} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white px-4 py-2.5 rounded-lg disabled:opacity-50 transition-transform active:scale-[0.98]" style={{ background: ORANGE, boxShadow: "0 1px 2px rgba(237,111,8,0.35)" }}>
           <RefreshCw size={15} /> Générer le déroulé
         </button>
         {!(fd.programme || "").trim() && <p className="text-xs mt-3" style={{ color: GREY }}>Saisissez d'abord un programme dans la fiche descriptive.</p>}

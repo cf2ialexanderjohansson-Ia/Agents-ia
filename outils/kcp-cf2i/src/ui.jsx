@@ -2,43 +2,106 @@ import { useRef, useEffect } from "react";
 import { ChevronDown, ChevronRight, X, Image as ImageIcon, ImagePlus } from "lucide-react";
 import { NAVY, NAVY2, ORANGE, LIGHT, GREY, LINE, SUBTLE } from "./store.js";
 
-/* ---------- éditeur (panneaux de saisie) ---------- */
+/* ---------- éditeur (panneaux de saisie) — habillage "app", style SaaS ---------- */
+const FOCUS_RING = "0 0 0 3px rgba(237,111,8,0.14)";
+const INPUT_BASE = "w-full text-sm rounded-lg border px-3 py-2 mt-1 bg-white outline-none transition-shadow duration-150";
+
+function useFocusRing() {
+  return {
+    onFocus: (e) => { e.target.style.borderColor = ORANGE; e.target.style.boxShadow = FOCUS_RING; },
+    onBlur: (e) => { e.target.style.borderColor = LINE; e.target.style.boxShadow = "none"; },
+  };
+}
+
 export function AutoGrow({ value, onChange, className, style, placeholder }) {
   const ref = useRef(null);
   useEffect(() => { const el = ref.current; if (el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; } }, [value]);
   return <textarea ref={ref} value={value} onChange={(e) => onChange(e.target.value)} rows={1} placeholder={placeholder}
     className={className} style={{ resize: "none", overflow: "hidden", ...style }} />;
 }
-export function Action({ onClick, icon, label, primary }) {
-  return <button onClick={onClick} className="flex items-center gap-1.5 text-sm font-semibold px-3 py-2 rounded-md"
-    style={primary ? { background: ORANGE, color: "#fff" } : { background: "#fff", color: NAVY, border: `1px solid ${LINE}` }}>{icon} {label}</button>;
+export function Action({ onClick, icon, label, primary, disabled }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="flex items-center gap-1.5 text-sm font-semibold px-3.5 py-2 rounded-lg transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+      style={primary
+        ? { background: ORANGE, color: "#fff", boxShadow: "0 1px 2px rgba(237,111,8,0.35)" }
+        : { background: "#fff", color: NAVY, border: `1px solid ${LINE}`, boxShadow: "0 1px 2px rgba(15,23,42,0.03)" }}
+      onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.filter = "brightness(0.97)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.filter = "none"; }}
+    >
+      {icon} {label}
+    </button>
+  );
 }
-export function Panel({ title, children }) {
-  return <div className="bg-white rounded-lg p-4 shadow-sm" style={{ border: `1px solid ${LINE}` }}>{title && <div className="font-bold mb-3" style={{ color: NAVY }}>{title}</div>}{children}</div>;
+export function Panel({ title, icon, children }) {
+  return (
+    <div className="bg-white rounded-xl p-4" style={{ border: `1px solid ${LINE}`, boxShadow: "0 1px 2px rgba(15,23,42,0.04)" }}>
+      {title && (
+        <div className="flex items-center gap-2 mb-3">
+          {icon}
+          <div className="font-bold text-[13.5px]" style={{ color: NAVY }}>{title}</div>
+        </div>
+      )}
+      {children}
+    </div>
+  );
 }
 export function Toggle({ open, onClick, icon, title, hint }) {
-  return <button onClick={onClick} className="w-full flex items-center gap-2 text-left">{icon}<span className="font-bold" style={{ color: NAVY }}>{title}</span>{hint && <span className="text-xs" style={{ color: GREY }}>{hint}</span>}<span className="flex-1" />{open ? <ChevronDown size={16} color={GREY} /> : <ChevronRight size={16} color={GREY} />}</button>;
+  return (
+    <button onClick={onClick} className="w-full flex items-center gap-2 text-left group">
+      <span className="inline-flex items-center justify-center rounded-lg shrink-0" style={{ width: 28, height: 28, background: "#FFF3EA" }}>{icon}</span>
+      <span className="font-bold text-[13.5px]" style={{ color: NAVY }}>{title}</span>
+      {hint && <span className="text-xs" style={{ color: GREY }}>{hint}</span>}
+      <span className="flex-1" />
+      <span className="rounded-md p-1 transition-transform duration-150" style={{ transform: open ? "rotate(0deg)" : "rotate(0deg)" }}>
+        {open ? <ChevronDown size={16} color={GREY} /> : <ChevronRight size={16} color={GREY} />}
+      </span>
+    </button>
+  );
 }
 export function Field({ label, v, onChange, placeholder }) {
-  return <label className="block mb-2">{label && <span className="text-[11px] font-semibold" style={{ color: GREY }}>{label}</span>}<input value={v} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="w-full text-sm rounded-md border px-2.5 py-1.5 mt-0.5" style={{ borderColor: LINE }} /></label>;
+  const focus = useFocusRing();
+  return (
+    <label className="block mb-2.5">
+      {label && <span className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: GREY }}>{label}</span>}
+      <input value={v} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={INPUT_BASE} style={{ borderColor: LINE }} {...focus} />
+    </label>
+  );
 }
 export function Select({ label, v, onChange, options }) {
-  return <label className="block mb-2"><span className="text-[11px] font-semibold" style={{ color: GREY }}>{label}</span><select value={v} onChange={(e) => onChange(e.target.value)} className="w-full text-sm rounded-md border px-2 py-1.5 mt-0.5 bg-white" style={{ borderColor: LINE }}>{options.map((o) => <option key={o}>{o}</option>)}</select></label>;
+  const focus = useFocusRing();
+  return (
+    <label className="block mb-2.5">
+      <span className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: GREY }}>{label}</span>
+      <select value={v} onChange={(e) => onChange(e.target.value)} className={INPUT_BASE + " cursor-pointer"} style={{ borderColor: LINE }} {...focus}>
+        {options.map((o) => <option key={o}>{o}</option>)}
+      </select>
+    </label>
+  );
 }
 export function Area({ label, v, onChange, rows = 3, placeholder, mono }) {
-  return <label className="block mb-2">{label && <span className="text-[11px] font-semibold" style={{ color: GREY }}>{label}</span>}<textarea value={v} onChange={(e) => onChange(e.target.value)} rows={rows} placeholder={placeholder} className="w-full text-sm rounded-md border p-2.5 mt-0.5" style={{ borderColor: LINE, fontFamily: mono ? "ui-monospace, monospace" : "inherit", fontSize: mono ? 12 : 14 }} /></label>;
+  const focus = useFocusRing();
+  return (
+    <label className="block mb-2.5">
+      {label && <span className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: GREY }}>{label}</span>}
+      <textarea value={v} onChange={(e) => onChange(e.target.value)} rows={rows} placeholder={placeholder} className={INPUT_BASE + " resize-none"}
+        style={{ borderColor: LINE, fontFamily: mono ? "ui-monospace, monospace" : "inherit", fontSize: mono ? 12 : 14 }} {...focus} />
+    </label>
+  );
 }
 export function Uploader({ label, hint, img, onPick, onClear, thumbBg }) {
   return (
     <div>
-      <div className="text-[11px] font-semibold mb-1" style={{ color: GREY }}>{label} <span className="font-normal">· {hint}</span></div>
+      <div className="text-[11px] font-semibold uppercase tracking-wide mb-1" style={{ color: GREY }}>{label} <span className="font-normal normal-case">· {hint}</span></div>
       {img ? (
-        <div className="relative rounded-md overflow-hidden flex items-center justify-center" style={{ border: `1px solid ${LINE}`, background: thumbBg || "#fff", height: 70 }}>
-          <img src={img} alt="" className="max-h-[58px] max-w-[90%] object-contain" />
-          <button onClick={onClear} className="absolute top-1 right-1 rounded-full p-0.5" style={{ background: "#fff", border: `1px solid ${LINE}` }}><X size={12} color="#c0392b" /></button>
+        <div className="relative rounded-lg overflow-hidden flex items-center justify-center" style={{ border: `1px solid ${LINE}`, background: thumbBg || "#fff", height: 74 }}>
+          <img src={img} alt="" className="max-h-[60px] max-w-[90%] object-contain" />
+          <button onClick={onClear} className="absolute top-1.5 right-1.5 rounded-full p-1 transition-colors" style={{ background: "#fff", border: `1px solid ${LINE}` }}><X size={12} color="#c0392b" /></button>
         </div>
       ) : (
-        <label className="flex flex-col items-center justify-center gap-1 rounded-md cursor-pointer text-xs font-semibold" style={{ border: `1px dashed ${GREY}`, color: NAVY, height: 70 }}>
+        <label className="flex flex-col items-center justify-center gap-1 rounded-lg cursor-pointer text-xs font-semibold transition-colors duration-150" style={{ border: `1.5px dashed #C7CFDA`, color: NAVY, height: 74, background: "#FAFBFC" }}>
           <ImageIcon size={16} /> Choisir une image<input type="file" accept="image/*" className="hidden" onChange={onPick} />
         </label>
       )}
