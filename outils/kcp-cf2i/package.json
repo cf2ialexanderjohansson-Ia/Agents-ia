@@ -1,0 +1,28 @@
+{
+  "name": "kcp-cf2i",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "docx": "^9.7.1",
+    "html2canvas-pro": "^2.2.1",
+    "jspdf": "^4.2.1",
+    "lucide-react": "^0.383.0",
+    "pptxgenjs": "^4.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "xlsx-js-style": "^1.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.1.5",
+    "vite": "^5.4.10",
+    "vite-plugin-singlefile": "^2.3.3"
+  }
+}
