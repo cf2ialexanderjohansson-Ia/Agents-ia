@@ -135,15 +135,33 @@ export function parseProgramme(text) {
 const PRACTICE = /(pratique|vol|exercice|atterrissage|décollage|prise en main|module|étalonnage|calibrat|montage|nettoyage)/i;
 const EVAL = /(évaluation|qcm|examen|debrief|analyse des logs)/i;
 
+// Blocs standards CF2i : ouverture de session (jour 1 uniquement),
+// pause courte insérée en milieu de demi-journée chargée, clôture de
+// session (dernier jour uniquement) — cf. modèle CF2i "Déroulé pédagogique".
+const OPENING_BLOCKS = [
+  { sequence: "Installation de la session", duree: 20, methode: "Organisation", support: "Ordinateur, connexion",
+    bullets: ["Installation et démarrage des postes", "Connexion à distance"] },
+  { sequence: "Démarrage – Accueil", duree: 30, methode: "Organisation", support: "Feuille de présence, supports stagiaire",
+    bullets: ["Présentation individuelle et recueil des attentes", "Rappel des objectifs", "Présentation du déroulé de la formation", "Remise des supports stagiaire et feuilles de présence"] },
+];
+const CLOSING_BLOCKS = [
+  { sequence: "Clôture de la session", duree: 20, methode: "Organisation", support: "Questionnaire de satisfaction",
+    bullets: ["Synthèse de la formation", "Remise du questionnaire de satisfaction"] },
+];
+const SHORT_PAUSE_MIN = 15;
+const SHORT_PAUSE_THRESHOLD = 120; // au-delà, on insère une pause courte en milieu de demi-journée
+
 // Construit un déroulé pédagogique à partir du programme
-// Journée type : 09h00–17h00, pause déjeuner fixe 12h30–14h00.
+// Journée type : 08h30–17h00, pause déjeuner fixe 12h30–14h00 (matin 240 min,
+// après-midi 180 min), ouverture de session le jour 1 et clôture le dernier
+// jour (blocs fixes CF2i).
 export function buildDeroule(programme) {
   const days = parseProgramme(programme);
-  const DAY_START = 9 * 60;      // 09:00
+  const DAY_START = 8 * 60 + 30; // 08:30
   const LUNCH_START = 12 * 60 + 30; // 12:30
   const LUNCH_END = 14 * 60;     // 14:00
   const DAY_END = 17 * 60;       // 17:00
-  const MORNING = LUNCH_START - DAY_START;   // 210 min
+  const MORNING = LUNCH_START - DAY_START;   // 240 min
   const AFTERNOON = DAY_END - LUNCH_END;     // 180 min
 
   const methodeFor = (s, dayTitle) =>
@@ -160,13 +178,43 @@ export function buildDeroule(programme) {
     sequence: "Pause déjeuner", contenu: "", methode: "Pause déjeuner", support: "", duree: "1 h 30",
   });
 
-  const distribute = (sections, start, total, dayTitle, out) => {
+  // Émet une séquence de blocs fixes (ouverture/clôture) à partir de `start` ; renvoie l'heure de fin.
+  const emitFixed = (blocks, start, out) => {
+    let clock = start;
+    blocks.forEach((b) => {
+      const end = clock + b.duree;
+      out.push({
+        horaire: `${fmt(clock)} – ${fmt(end)}`,
+        sequence: b.sequence, contenu: b.bullets.join(" · "),
+        methode: b.methode, support: b.support, duree: fmtDur(b.duree),
+      });
+      clock = end;
+    });
+    return clock;
+  };
+
+  // Répartit les sections d'une demi-journée sur `total` minutes à partir de
+  // `start`, en insérant une courte pause au milieu si la demi-journée est chargée.
+  const distribute = (sections, start, total, dayTitle, out, { pause } = {}) => {
     const n = sections.length;
     if (!n) return;
+    const usePause = pause && total >= SHORT_PAUSE_THRESHOLD;
+    const pauseMin = usePause ? SHORT_PAUSE_MIN : 0;
+    const contentTotal = total - pauseMin;
+    const pauseAfter = usePause ? Math.ceil(n / 2) : -1;
+
+    const durations = [];
+    let acc = 0;
+    sections.forEach((s, i) => {
+      const end = Math.round((contentTotal * (i + 1)) / n);
+      durations.push(end - acc);
+      acc = end;
+    });
+
     let clock = start;
     sections.forEach((s, i) => {
-      const end = start + Math.round((total * (i + 1)) / n);
-      const dur = end - clock;
+      const dur = durations[i];
+      const end = clock + dur;
       const methode = methodeFor(s, dayTitle);
       out.push({
         horaire: `${fmt(clock)} – ${fmt(end)}`,
@@ -177,22 +225,42 @@ export function buildDeroule(programme) {
         duree: fmtDur(dur),
       });
       clock = end;
+      if (i + 1 === pauseAfter) {
+        const pEnd = clock + pauseMin;
+        out.push({ horaire: `${fmt(clock)} – ${fmt(pEnd)}`, sequence: "Pause", contenu: "", methode: "Pause", support: "", duree: fmtDur(pauseMin) });
+        clock = pEnd;
+      }
     });
   };
 
   return days.map((d, di) => {
+    const isFirst = di === 0;
+    const isLast = di === days.length - 1;
     const secs = d.sections;
     const N = secs.length;
     const slots = [];
-    if (N === 0) { slots.push(lunch()); return { title: d.title || `Jour ${di + 1}`, slots }; }
+
+    let morningStart = DAY_START;
+    if (isFirst) morningStart = emitFixed(OPENING_BLOCKS, DAY_START, slots);
+    const morningBudget = LUNCH_START - morningStart;
+
+    if (N === 0) {
+      slots.push(lunch());
+      if (isLast) emitFixed(CLOSING_BLOCKS, LUNCH_END, slots);
+      return { title: d.title || `Jour ${di + 1}`, slots };
+    }
 
     let k = Math.round((N * MORNING) / (MORNING + AFTERNOON)); // nb de séquences le matin
     k = Math.max(1, Math.min(N, k));
     if (N >= 2) k = Math.min(N - 1, k); // au moins une séquence l'après-midi
 
-    distribute(secs.slice(0, k), DAY_START, MORNING, d.title, slots);
+    distribute(secs.slice(0, k), morningStart, morningBudget, d.title, slots, { pause: true });
     slots.push(lunch());
-    distribute(secs.slice(k), LUNCH_END, AFTERNOON, d.title, slots);
+
+    const closingMin = isLast ? CLOSING_BLOCKS.reduce((sum, b) => sum + b.duree, 0) : 0;
+    const afternoonContentBudget = AFTERNOON - closingMin;
+    distribute(secs.slice(k), LUNCH_END, afternoonContentBudget, d.title, slots, { pause: true });
+    if (isLast) emitFixed(CLOSING_BLOCKS, LUNCH_END + afternoonContentBudget, slots);
 
     return { title: d.title || `Jour ${di + 1}`, slots };
   });

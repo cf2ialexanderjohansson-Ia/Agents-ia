@@ -83,7 +83,7 @@ export function exportDerouleExcel(fd, filename) {
       const label = half.label ? `${dayLabel} — ${half.label} = ${total}'` : `${dayLabel} = ${total}'`;
       rows.push(bandRow(label, total));
       half.slots.forEach((s) => {
-        const evalMod = s.methode === "Pause déjeuner" ? "" : "Évaluation formateur";
+        const evalMod = ["Pause déjeuner", "Pause", "Organisation"].includes(s.methode) ? "" : "Évaluation formateur";
         rows.push(blockRow(s.sequence, parseDureeToMinutes(s.duree), evalMod, s.support));
         (s.contenu || "").split(" · ").map((x) => x.trim()).filter(Boolean).forEach((it) => rows.push(subRow(it)));
       });

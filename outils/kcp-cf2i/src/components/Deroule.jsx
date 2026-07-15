@@ -3,7 +3,8 @@ import { RefreshCw, Plus, Trash2, Clock } from "lucide-react";
 import { NAVY, ORANGE, LIGHT, GREY, LINE, buildDeroule } from "../store.js";
 import { Action, PreviewHeader, PreviewFooter } from "../ui.jsx";
 
-const METHODES = ["Apport théorique", "Pratique / atelier", "Démonstration", "Évaluation", "Pause déjeuner"];
+const METHODES = ["Organisation", "Apport théorique", "Pratique / atelier", "Démonstration", "Évaluation", "Pause", "Pause déjeuner"];
+const PAUSE_METHODES = ["Pause déjeuner", "Pause"];
 // largeurs en % (somme = 100) -> le tableau tient toujours dans la page
 const COLS = [
   ["Horaire", "9%"], ["Séquence / objectif", "17%"], ["Contenu", "33%"],
@@ -71,7 +72,7 @@ export default function Deroule({ fd, setFd, constants }) {
                 </thead>
                 <tbody>
                   {day.slots.map((s, si) => (
-                    <tr key={si} style={{ background: s.methode === "Pause déjeuner" ? "#FFF7EF" : "#fff" }}>
+                    <tr key={si} style={{ background: PAUSE_METHODES.includes(s.methode) ? "#FFF7EF" : "#fff" }}>
                       <Td><AutoArea v={s.horaire} on={(v) => update(di, si, "horaire", v)} /></Td>
                       <Td><AutoArea v={s.sequence} on={(v) => update(di, si, "sequence", v)} bold /></Td>
                       <Td><AutoArea v={s.contenu} on={(v) => update(di, si, "contenu", v)} /></Td>
