@@ -36,7 +36,7 @@ function loadImageSize(dataUrl) {
 // "FD - Bleu" / "FD - Orange" / "FD - Gris" : titre de section coloré, sans bandeau
 function sectionHeading(text, color) {
   return new Paragraph({
-    spacing: { before: 240, after: 120 },
+    spacing: { before: 140, after: 60 },
     indent: { left: 200 },
     children: [new TextRun({ text, bold: true, color, size: 20, font: FONT })],
   });
@@ -53,7 +53,7 @@ function band(text, { fill, size = 22, before = 240 }) {
 }
 
 // "FD - Puces Page 1" / "FD - Puces contenu" : puce justifiée
-function bulletP(text, after = 80) {
+function bulletP(text, after = 40) {
   return new Paragraph({
     bullet: { level: 0 },
     alignment: AlignmentType.JUSTIFIED,
@@ -62,7 +62,7 @@ function bulletP(text, after = 80) {
   });
 }
 
-function bulletList(items, after = 80) {
+function bulletList(items, after = 40) {
   if (!items || items.length === 0) return [bulletP("—", after)];
   return items.map((it) => bulletP(it, after));
 }
@@ -99,9 +99,10 @@ function statCell(n, label) {
   return new TableCell({
     width: { size: 25, type: WidthType.PERCENTAGE },
     verticalAlign: VerticalAlign.CENTER,
+    margins: { top: 40, bottom: 40 },
     children: [
-      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 20 }, children: [new TextRun({ text: n || "—", bold: true, color: ORANGE, size: 28, font: FONT })] }),
-      new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: label, color: GREY, size: 14, font: FONT })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 8 }, children: [new TextRun({ text: n || "—", bold: true, color: ORANGE, size: 22, font: FONT })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: label, color: GREY, size: 12, font: FONT })] }),
     ],
   });
 }
@@ -183,7 +184,7 @@ export async function exportFicheDescriptiveWord(fd, constants, filename) {
   const children = [];
 
   if (fd.accroche) {
-    children.push(new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: fd.accroche, size: 20, font: FONT })] }));
+    children.push(new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: fd.accroche, size: 20, font: FONT })] }));
   }
 
   children.push(
@@ -196,7 +197,6 @@ export async function exportFicheDescriptiveWord(fd, constants, filename) {
       ],
     })
   );
-  children.push(new Paragraph({ text: "" }));
 
   // bandeau contact (déplacé dans la grille, en colonne, plutôt qu'en bloc
   // plein largeur isolé en bas de page — un petit bloc seul juste avant le
@@ -242,9 +242,8 @@ export async function exportFicheDescriptiveWord(fd, constants, filename) {
     })
   );
   lines(stats.note).forEach((l) =>
-    children.push(new Paragraph({ spacing: { after: 20 }, children: [new TextRun({ text: l, color: GREY, size: 14, font: FONT })] }))
+    children.push(new Paragraph({ spacing: { after: 6 }, children: [new TextRun({ text: l, color: GREY, size: 12, font: FONT })] }))
   );
-  children.push(new Paragraph({ text: "" }));
 
   // page 2 — contenu de la formation
   // (pageBreakBefore sur le titre plutôt qu'un paragraphe de saut de page à
@@ -282,7 +281,7 @@ export async function exportFicheDescriptiveWord(fd, constants, filename) {
       properties: {
         page: {
           size: { width: 11906, height: 16838 }, // A4
-          margin: { top: 1500, bottom: 850, left: 850, right: 850 },
+          margin: { top: 1100, bottom: 700, left: 850, right: 850 },
         },
       },
       headers: { default: header },
