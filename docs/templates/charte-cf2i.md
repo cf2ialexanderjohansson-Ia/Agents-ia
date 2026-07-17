@@ -15,6 +15,16 @@ Source : outil interne CF2i de génération de fiches programme (`CF2i_kit_KCP.h
 
 Ne pas introduire d'autres couleurs dominantes (pas de bleu profond/cyan différent, pas de palette d'AI générique) : ces 6 valeurs sont la seule palette à utiliser.
 
+## Logo
+
+Fichier officiel fourni par l'utilisateur le 2026-07-17 : [`assets/logo-cf2i.png`](assets/logo-cf2i.png) (fond détouré, transparent).
+
+- Encre du logotype : gris très foncé quasi noir (`#181818`) — **ne pas recolorer en bleu marine**, c'est une teinte propre au logo, distincte du bleu marine `#15293F` utilisé pour les fonds/UI.
+- Carré d'accent du logo : orange vif (`#FF5D00` environ) — proche de l'orange charte `#ED6F08` mais pas identique ; ne pas non plus le remplacer, c'est la couleur réelle du fichier fourni.
+- Sur fond sombre (bandeau bleu marine) : toujours poser le logo sur une plaque blanche arrondie (`.brand__plate`), jamais directement sur le fond, car le logotype est en encre foncée.
+- Sur fond clair (pied de page, page blanche) : utiliser directement, sans plaque.
+- Ne jamais utiliser le lockup textuel provisoire "CF2I" (texte + carré orange en CSS) une fois ce fichier disponible — il ne servait qu'en attendant le vrai logo.
+
 ## Typographie
 
 Décision explicite (2026-07-02) : **Arial** pour tous les titres et le texte courant, sur l'ensemble des documents CF2I.
